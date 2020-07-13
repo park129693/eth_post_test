@@ -7,7 +7,7 @@ class PostStorage {
     latestId = -1;
 
     async getPost(id) {
-        let post = await web3.postsave.method.posts(id).call();
+        let post = await web3.postsave.methods.posts(id).call();
 
         this.posts.push({
             ...post,
@@ -17,11 +17,21 @@ class PostStorage {
 
     constructor() {
         web3.http.eth.net.isListening().then(() => {
-            
+            (async () => {
+                let id = await web3.postsave.methods.getNumPost();
+                for (let i = id - 1; i >= 0 && i >= id - 21; --i) {
+                    let post = await web3.postsave.methods.post(i);
+                    this.posts.push({
+                        ...post,
+                        id: i,
+                    })
+                }
+                this.publish();
+            })();
         });
 
         web3.ws.eth.net.isListening().then(()=>{
-            web3.postsave.events.PostUpdated({ fromBlock: "latest" }, (err, result) => {
+            web3.postsave.events.PostUpdated({ fromBlock: "latest" }, (error, result) => {
                 if (error) {
                     console.error(error);
                     return;
@@ -62,3 +72,7 @@ class PostStorage {
     }
 
 }
+
+let postStorage = new PostStorage();
+
+export default postStorage;

@@ -1,31 +1,44 @@
-import React from 'react';
+import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import Writer from './Writer';
+import Post from "./Post";
+import postStorage from "./PostStorage";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-          Hellow world!!
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-      <div>
-        <Writer />
+class App extends Component {
+  constructor() {
+    super();
+    this.state = {
+      posts: [],
+    };
+  }
+
+  componentDidMount() {
+    postStorage.subscribe(this);
+  }
+
+  componentWillUnmount() {
+    postStorage.unsubscrtibe(this);
+  }
+  redner() {
+    return (
+      <div className="App">
+        <header className="App-header">
+          <h1 className="App-title">Blockchain PostSave</h1>
+        </header>
+        <div>
+          <Writer />
+          <div>
+            {
+              Object
+              .keys(this.state.posts)
+              .map(key => <Post post={this.state.posts[key]} />)
+            }
+          </div>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 }
 
 export default App;
